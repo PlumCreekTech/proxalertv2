@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    this is the source code for android.R.layout.simple_list_item_multiple_choice that I copied and pasted
+    so that we could build from it and customize it if we want
+-->
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/checked_text_view"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+    android:gravity="center_vertical"
+    android:paddingLeft="6dip"
+    android:paddingRight="6dip"
+    android:textAppearance="?android:attr/textAppearanceLarge" />
