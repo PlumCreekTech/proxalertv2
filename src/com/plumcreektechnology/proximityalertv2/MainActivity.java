@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +28,8 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	private ProxAlertService service;
 	private boolean bound;
 	private UserFragment userFragment;
+	private Empty empty;
+	private android.support.v4.app.FragmentManager fragMan;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +39,16 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		Intent intent = new Intent(this, ProxAlertService.class);
 		bindService(intent, connection, Context.BIND_AUTO_CREATE);
 		treeGrow();
-		// add UserFragment
-		UserFragment ufrag = new UserFragment();
-		ufrag.setListAdapter(treeAdapter());
-		userFragment = ufrag;
-		fragAdder(ufrag);
+		// fragments!
+		fragMan = getSupportFragmentManager();
+		// empty
+		empty = new Empty();
+		fragAdder(empty);
+		fragRemover(empty);
+		// user
+		userFragment = new UserFragment();
+		userFragment.setListAdapter(treeAdapter());
+		fragAdder(userFragment);
 	}
 	
 	/**
@@ -83,14 +93,16 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * when a menu item is selected starts its corresponding fragment
 	 */
 	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		case R.id.action_settings:
-			fragReplacer((Fragment) new SettingsFragment());
-		case R.id.user_frag:
-			fragReplacer((Fragment) userFragment);
-		default:
-			return super.onOptionsItemSelected(item);
+		int itemId = item.getItemId();
+		switch(itemId){
+		case (R.id.action_settings):
+			fragReplacer(empty);
+			break;
+		case (R.id.user_frag):
+			fragReplacer(userFragment);
+			break;
 		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	/**
@@ -98,7 +110,23 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * @param frag
 	 */
 	private void fragAdder(Fragment frag) {
-		getSupportFragmentManager().beginTransaction().add(R.id.container, frag).commit();
+		android.support.v4.app.FragmentTransaction trans = fragMan.beginTransaction();
+		trans.add(R.id.container, frag);
+		trans.addToBackStack(null);
+		trans.commit();
+		Log.d("adder", "fragAdder was probably a success");
+	}
+	
+	/**
+	 * private utility for removing fragments
+	 * @param frag
+	 */
+	private void fragRemover(Fragment frag) {
+		android.support.v4.app.FragmentTransaction trans = fragMan.beginTransaction();
+		trans.remove(frag);
+		trans.addToBackStack(null);
+		trans.commit();
+		Log.d("adder", "fragAdder was probably a success");
 	}
 	
 	/**
@@ -106,7 +134,12 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * @param frag
 	 */
 	private void fragReplacer(Fragment frag) {
-		getSupportFragmentManager().beginTransaction().replace(R.id.container, frag).commit();
+		android.support.v4.app.FragmentTransaction trans = fragMan.beginTransaction();
+		Log.d("replacer", "trans begun");
+		trans.replace(R.id.container, frag);
+		trans.addToBackStack(null);
+		Log.d("replacer", "added to backstack");
+		trans.commit();
 	}
 	
 	/**
