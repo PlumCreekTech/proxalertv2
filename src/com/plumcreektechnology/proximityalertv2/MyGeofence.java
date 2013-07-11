@@ -83,7 +83,7 @@ public class MyGeofence implements Comparable<MyGeofence>, ProxConstants {
 	}
 	
 	public String toString(){
-		return "("+latitude+", "+longitude+")";
+		return id+" ("+latitude+", "+longitude+")";
 	}
 
 }

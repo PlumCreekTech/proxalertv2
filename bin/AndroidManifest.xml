@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <service android:name="com.plumcreektechnology.proximityalertv2.ProxAlertService" />
-        <receiver android:name="com.plumcreektechnology.proximityalertv2.ProxReceiver" />
+<!--         <receiver android:name="com.plumcreektechnology.proximityalertv2.ProxReceiver" /> -->
     </application>
 
 </manifest>

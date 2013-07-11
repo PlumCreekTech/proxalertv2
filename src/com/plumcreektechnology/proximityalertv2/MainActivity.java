@@ -4,19 +4,22 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.plumcreektechnology.proximityalertv2.ProxAlertService.ProxAlertBinder;
 import com.plumcreektechnology.proximityalertv2.UserFragment.POISelect;
@@ -27,24 +30,37 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	
 	private ProxAlertService service;
 	private boolean bound;
+	private ProxReceiver receiver;
 	private UserFragment userFragment;
-	private Empty empty;
-	private android.support.v4.app.FragmentManager fragMan;
+	//private Empty empty;
+	private SettingsFragment settingsFragment;
+	private FragmentManager fragMan;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
 		// bind activity to ProxAlertService
 		Intent intent = new Intent(this, ProxAlertService.class);
 		bindService(intent, connection, Context.BIND_AUTO_CREATE);
 		treeGrow();
+		
+		//register receiver
+		receiver = new ProxReceiver();
+		IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
+		registerReceiver(receiver, filter);
+		
 		// fragments!
-		fragMan = getSupportFragmentManager();
+		fragMan = getFragmentManager();
 		// empty
-		empty = new Empty();
-		fragAdder(empty);
-		fragRemover(empty);
+//		empty = new Empty();
+//		fragAdder(empty);
+//		fragRemover(empty);
+		// settings
+		settingsFragment = new SettingsFragment();
+		fragAdder(settingsFragment);
+		fragRemover(settingsFragment);
 		// user
 		userFragment = new UserFragment();
 		userFragment.setListAdapter(treeAdapter());
@@ -96,7 +112,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		int itemId = item.getItemId();
 		switch(itemId){
 		case (R.id.action_settings):
-			fragReplacer(empty);
+			fragReplacer(settingsFragment);
 			break;
 		case (R.id.user_frag):
 			fragReplacer(userFragment);
@@ -110,11 +126,10 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * @param frag
 	 */
 	private void fragAdder(Fragment frag) {
-		android.support.v4.app.FragmentTransaction trans = fragMan.beginTransaction();
+		FragmentTransaction trans = fragMan.beginTransaction();
 		trans.add(R.id.container, frag);
 		trans.addToBackStack(null);
 		trans.commit();
-		Log.d("adder", "fragAdder was probably a success");
 	}
 	
 	/**
@@ -122,11 +137,10 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * @param frag
 	 */
 	private void fragRemover(Fragment frag) {
-		android.support.v4.app.FragmentTransaction trans = fragMan.beginTransaction();
+		FragmentTransaction trans = fragMan.beginTransaction();
 		trans.remove(frag);
 		trans.addToBackStack(null);
 		trans.commit();
-		Log.d("adder", "fragAdder was probably a success");
 	}
 	
 	/**
@@ -134,11 +148,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * @param frag
 	 */
 	private void fragReplacer(Fragment frag) {
-		android.support.v4.app.FragmentTransaction trans = fragMan.beginTransaction();
-		Log.d("replacer", "trans begun");
+		FragmentTransaction trans = fragMan.beginTransaction();
 		trans.replace(R.id.container, frag);
 		trans.addToBackStack(null);
-		Log.d("replacer", "added to backstack");
 		trans.commit();
 	}
 	
@@ -168,6 +180,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	@Override
 	public void onPointSelect(String name, boolean flag) {
 		if (bound) {
+			Toast.makeText(this, "bound and processing in main actiivty", Toast.LENGTH_SHORT).show();
 			if (flag) {
 				service.addProximityAlert(tree.get(name));
 			} else {

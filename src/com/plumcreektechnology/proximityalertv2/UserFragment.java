@@ -1,13 +1,14 @@
 package com.plumcreektechnology.proximityalertv2;
 
 import android.app.Activity;
+import android.app.ListFragment;  // is available in both normal and support libs
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class UserFragment extends ListFragment {
 	
@@ -54,6 +55,7 @@ public class UserFragment extends ListFragment {
 	 */
 	public void onListItemClick(ListView lv, View v, int position, long id) {
 		CheckedTextView check = (CheckedTextView) v;
+		Toast.makeText(getActivity(), "point selected: "+check.getText()+" || status: "+check.isChecked(), Toast.LENGTH_SHORT).show();
 		onSelect.onPointSelect( check.getText().toString(), check.isChecked());
 	}
 }
