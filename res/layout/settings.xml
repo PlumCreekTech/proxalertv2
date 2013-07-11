@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" 
-    android:persistent="false"> 
+    android:persistent="true"> 
      <SwitchPreference 
             android:key="onoff"
             android:title="Location Updates"
             android:defaultValue="true">
             <intent
                 />
+            
 	</SwitchPreference>
-        
-    
+	<com.plumcreektechnology.proximityalertv2.SliderPreference
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:enabled="true"
+	    android:persistent="true"
+	    android:selectable="false"
+	    android:shouldDisableView="true"
+	    />
      
     <!-- <PreferenceScreen
         android:key="subScreen"
