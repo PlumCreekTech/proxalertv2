@@ -30,7 +30,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	
 	private ProxAlertService service;
 	private boolean bound;
-	private ProxReceiver receiver;
+//	private ProxReceiver receiver;
 	private UserFragment userFragment;
 	//private Empty empty;
 	private SettingsFragment settingsFragment;
@@ -47,9 +47,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		treeGrow();
 		
 		//register receiver
-		receiver = new ProxReceiver();
-		IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
-		registerReceiver(receiver, filter);
+//		receiver = new ProxReceiver();
+//		IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
+//		registerReceiver(receiver, filter);
 		
 		// fragments!
 		fragMan = getFragmentManager();
@@ -196,6 +196,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	protected void onDestroy() {
 		super.onDestroy();
+//		unregisterReceiver(receiver);
 		if (bound) {
 			unbindService(connection);
 		}

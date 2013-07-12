@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 
 public class MyDialogFragment extends DialogFragment implements ProxConstants {
@@ -60,7 +59,7 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 			Intent websurfing = new Intent(Intent.ACTION_VIEW, Uri.parse(URI));
 			startActivity(websurfing);
 		}
-		dismiss();
+		getActivity().finish();
 	}
 
 }
