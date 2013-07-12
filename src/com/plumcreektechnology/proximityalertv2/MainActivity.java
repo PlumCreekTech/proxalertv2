@@ -200,4 +200,5 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			unbindService(connection);
 		}
 	}
+
 }

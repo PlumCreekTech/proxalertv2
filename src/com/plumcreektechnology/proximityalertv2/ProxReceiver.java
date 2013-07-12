@@ -1,11 +1,15 @@
 package com.plumcreektechnology.proximityalertv2;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 public class ProxReceiver extends BroadcastReceiver {
@@ -16,6 +20,7 @@ public class ProxReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
+
 		// extract name and uri from intent
 		String name = intent.getStringExtra("POI");
 		String uri = intent.getStringExtra("URI");
@@ -34,6 +39,17 @@ public class ProxReceiver extends BroadcastReceiver {
 		((NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE)).notify(
 				name.hashCode(), builder.build());
+		
+		// assemble dialog from the receiver
+		MyDialogFragment dfrag = new MyDialogFragment();
+		// put the POI and URI arguments in the bundle
+		Bundle fragBundle = new Bundle();
+		fragBundle.putString("POI", intent.getStringExtra("POI"));
+		fragBundle.putString("URI", intent.getStringExtra("URI"));
+		dfrag.setArguments(fragBundle);
+		FragmentManager fragman = ((Activity) context).getFragmentManager();
+		dfrag.show(fragman, null);
+		
 	}
 
 }

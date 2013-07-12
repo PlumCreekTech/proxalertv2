@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <TextView
+        android:id="@+id/textview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="default text"
+        />
+    <Button 
+        android:id="@+id/negative"
+        android:layout_below="@id/textview"
+        android:layout_toLeftOf="@id/negative"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mhm"/>
+    <Button 
+        android:id="@+id/positive"
+        android:layout_toRightOf="@id/negative"
+        android:layout_below="@id/textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="uhu"/>
+    
+</RelativeLayout>
