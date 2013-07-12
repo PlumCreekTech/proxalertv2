@@ -48,10 +48,12 @@ public class ProxReceiver extends BroadcastReceiver {
 					name.hashCode(), builder.build());
 
 			// call our activity that creates the dialog
-			Intent intend = new Intent(context, InvisibleActivity.class);
-			intend.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			//Intent intend = new Intent(context, InvisibleActivity.class); for when we were using a separate class
+			Intent intend = new Intent(context, MainActivity.class);
+			intend.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			intend.putExtra("POI", intent.getStringExtra("POI"));
 			intend.putExtra("URI", intent.getStringExtra("URI"));
+			intend.putExtra("dialog", true);
 			context.startActivity(intend);
 
 		}

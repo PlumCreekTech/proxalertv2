@@ -67,6 +67,25 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		fragAdder(userFragment);
 	}
 	
+	protected void onNewIntent(Intent intent) {
+		if(intent.getBooleanExtra("dialog", false)) {
+			//remove preexisting fragments
+			if(userFragment.isVisible()){ //do we need tags...? why did we do that before?
+				fragRemover(userFragment);
+			} else {
+				fragRemover(settingsFragment);
+			}
+			//show dialog
+			MyDialogFragment dfrag = new MyDialogFragment();
+			Bundle fragBundle = new Bundle();
+			fragBundle.putString("POI", intent.getStringExtra("POI"));
+			fragBundle.putString("URI", intent.getStringExtra("URI"));
+			dfrag.setArguments(fragBundle);
+			FragmentManager fragman = getFragmentManager();
+			dfrag.show(fragman, null);
+		}
+	}
+	
 	/**
 	 * automatically populates the tree with premade MyGeofences (which will
 	 * then populate a list in the user fragment)
@@ -190,6 +209,8 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			Log.d("CONNECTION ERROR", "service is not connected!");
 		}
 	}
+	
+	
 
 	/**
 	 * unbind from service at the end of activity
