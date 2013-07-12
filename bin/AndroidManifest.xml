@@ -26,7 +26,11 @@
         </activity>
         
         <activity android:name=".InvisibleActivity"
-            android:theme="@style/Theme.Transparent"/>
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         
         <service android:name="com.plumcreektechnology.proximityalertv2.ProxAlertService" />
         

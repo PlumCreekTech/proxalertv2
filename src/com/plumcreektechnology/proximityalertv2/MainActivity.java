@@ -127,7 +127,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	private void fragAdder(Fragment frag) {
 		FragmentTransaction trans = fragMan.beginTransaction();
-		trans.add(R.id.container, frag);
+		trans.add(R.id.main_root, frag);
 		trans.addToBackStack(null);
 		trans.commit();
 	}
@@ -149,7 +149,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	private void fragReplacer(Fragment frag) {
 		FragmentTransaction trans = fragMan.beginTransaction();
-		trans.replace(R.id.container, frag);
+		trans.replace(R.id.main_root, frag);
 		trans.addToBackStack(null);
 		trans.commit();
 	}
