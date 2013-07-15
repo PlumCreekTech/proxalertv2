@@ -59,7 +59,7 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 			Intent websurfing = new Intent(Intent.ACTION_VIEW, Uri.parse(URI));
 			startActivity(websurfing);
 		}
-		getActivity().finish();
+		dismiss();
 	}
 
 }

@@ -29,7 +29,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	private TreeMap<String, MyGeofence> tree;
 	
 	private ProxAlertService service;
+	private boolean dialogAlert;
 	private boolean bound;
+	private boolean runningInterface;
 //	private ProxReceiver receiver;
 	private UserFragment userFragment;
 	//private Empty empty;
@@ -51,6 +53,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 //		IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
 //		registerReceiver(receiver, filter);
 		
+		dialogAlert = false;
+		runningInterface = true;
+		
 		// fragments!
 		fragMan = getFragmentManager();
 		// empty
@@ -68,13 +73,17 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	}
 	
 	protected void onNewIntent(Intent intent) {
-		if(intent.getBooleanExtra("dialog", false)) {
+		dialogAlert = intent.getBooleanExtra("dialog", false);
+		if(dialogAlert && !runningInterface) {
 			//remove preexisting fragments
 			if(userFragment.isVisible()){ //do we need tags...? why did we do that before?
 				fragRemover(userFragment);
 			} else {
 				fragRemover(settingsFragment);
 			}
+			getActionBar().hide();
+		}
+		if(dialogAlert) {
 			//show dialog
 			MyDialogFragment dfrag = new MyDialogFragment();
 			Bundle fragBundle = new Bundle();
@@ -86,19 +95,37 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		}
 	}
 	
+	protected void onResume() {
+		super.onResume();
+		if(dialogAlert) { // if a dialog is happening, then onNewIntent handled it
+			dialogAlert = false;
+		} else { // otherwise, if nothing but the dialog is visible, pull up the user fragment
+			if(!userFragment.isVisible() && !settingsFragment.isVisible()){ //do we need tags...? why did we do that before?
+				fragReplacer(userFragment);
+			}
+			getActionBar().show();
+			runningInterface = true;
+		}
+	}
+	
+	protected void onStop() {
+		super.onStop();
+		runningInterface = false;
+	}
+	
 	/**
 	 * automatically populates the tree with premade MyGeofences (which will
 	 * then populate a list in the user fragment)
 	 */
 	private void treeGrow() {
 		tree = new TreeMap<String, MyGeofence>();
-		tree.put("Public Library", new MyGeofence("Public Library", 41.289818, -82.216895, RADIUS, EXPIRATION, URL));
-		tree.put("South", new MyGeofence("South", 41.289508, -82.221159, RADIUS, EXPIRATION, URL));
-		tree.put("Hales", new MyGeofence("Hales", 41.294764, -82.223917, RADIUS, EXPIRATION, URL));
-		tree.put("Science Center", new MyGeofence("Science Center", 41.294692, -82.221782, RADIUS, EXPIRATION, URL));
-		tree.put("Laundromat", new MyGeofence("Laundromat", 41.294426, -82.212115, RADIUS, EXPIRATION, URL));
-		tree.put("Tank", new MyGeofence("Tank", 41.292088, -82.213263, RADIUS, EXPIRATION, URL));
-		tree.put("Arboretum", new MyGeofence("Arboretum", 41.285558, -82.226127, RADIUS, EXPIRATION, URL));
+		tree.put("Public Library", new MyGeofence("Public Library", 41.289818, -82.216895, RADIUS, EXPIRATION, "http://www.oberlinpl.lib.oh.us/"));
+		tree.put("South", new MyGeofence("South", 41.289508, -82.221159, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/traditional-housing/south.dot"));
+		tree.put("Hales", new MyGeofence("Hales", 41.294764, -82.223917, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=352252&buildingId=30220"));
+		tree.put("Science Center", new MyGeofence("Science Center", 41.294692, -82.221782, RADIUS, EXPIRATION, "http://www.oberlin.edu/science/"));
+		tree.put("Laundromat", new MyGeofence("Laundromat", 41.294426, -82.212115, RADIUS, EXPIRATION, "http://en.wiktionary.org/wiki/laundromat"));
+		tree.put("Tank", new MyGeofence("Tank", 41.292088, -82.213263, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/co-ops/tank.dot"));
+		tree.put("Arboretum", new MyGeofence("Arboretum", 41.285558, -82.226127, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=2111210&buildingId=175090"));
 	}
 
 	/**
@@ -209,8 +236,6 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			Log.d("CONNECTION ERROR", "service is not connected!");
 		}
 	}
-	
-	
 
 	/**
 	 * unbind from service at the end of activity
