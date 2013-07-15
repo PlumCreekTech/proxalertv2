@@ -10,7 +10,7 @@
             
 	</SwitchPreference>
 	<com.plumcreektechnology.proximityalertv2.SliderPreference
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:enabled="true"
 	    android:persistent="true"

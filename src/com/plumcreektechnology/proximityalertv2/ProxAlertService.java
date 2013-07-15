@@ -10,7 +10,7 @@ import android.os.IBinder;
 
 public class ProxAlertService extends Service implements ProxConstants{
 
-	private final IBinder binder = new ProxAlertBinder();
+	private final ProxAlertBinder binder = new ProxAlertBinder();
 	private LocationManager locationManager;
 	
 	/**

@@ -10,7 +10,6 @@ import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import com.plumcreektechnology.proximityalertv2.ProxAlertService.ProxAlertBinder;
 import com.plumcreektechnology.proximityalertv2.UserFragment.POISelect;
@@ -30,6 +28,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	
 	// receiver is registered in manifest
 	private ProxAlertService service;
+	private int size;
 	private boolean dialogAlert; // boolean keeps track of if we are displaying a dialogAlert on this resuming
 	private boolean bound; // keeps track of bound status to client
 	private boolean runningInterface; // keeps track of if the activity is currently displaying a user interface
@@ -38,6 +37,27 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	//private Empty empty;
 	private SettingsFragment settingsFragment;
 	private FragmentManager fragMan;
+	
+	/**
+	 * service connection global variable for binding to ProxAlertService
+	 */
+	private ServiceConnection connection = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder iBinder) {
+			ProxAlertBinder binder = (ProxAlertBinder) iBinder;
+			service = binder.getService();
+			bound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			bound = false;			
+		}
+		
+	};
+
+	//------------------------LIFECYCLE ORIENTED STUFF-------------------------//	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +68,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		Intent intent = new Intent(this, ProxAlertService.class);
 		bindService(intent, connection, Context.BIND_AUTO_CREATE);
 		treeGrow();
+		size = tree.size();
 		
 		// fragments!
 		fragMan = getFragmentManager();
@@ -61,6 +82,17 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		fragAdder(userFragment);
 		runningInterface = false;
 	}
+
+	/**
+	 * initialize the options menu
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
 	
 	protected void onStart() {
 		super.onStart();
@@ -112,6 +144,18 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	}
 	
 	/**
+	 * unbind from service at the end of activity
+	 */
+	protected void onDestroy() {
+		super.onDestroy();
+		if (bound) {
+			unbindService(connection);
+		}
+	}
+
+	//------------------------------OTHER STUFF-------------------------------//
+	
+	/**
 	 * automatically populates the tree with premade MyGeofences (which will
 	 * then populate a list in the user fragment)
 	 */
@@ -137,16 +181,6 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			treeList.add(entry.getKey());
 		}
 		return new ArrayAdapter<String>(this, R.layout.checked_text, treeList);
-	}
-	
-	/**
-	 * initialize the options menu
-	 */
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
 	}
 	
 	/**
@@ -198,24 +232,6 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		trans.commit();
 	}
 	
-	/**
-	 * service connection utility for binding to ProxAlertService
-	 */
-	private ServiceConnection connection = new ServiceConnection() {
-
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder iBinder) {
-			ProxAlertBinder binder = (ProxAlertBinder) iBinder;
-			service = binder.getService();
-			bound = true;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			bound = false;			
-		}
-		
-	};
 	
 	/**
 	 * receive changes from user interface and ask service to add and remove
@@ -224,7 +240,6 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	@Override
 	public void onPointSelect(String name, boolean flag) {
 		if (bound) {
-			Toast.makeText(this, "bound and processing in main actiivty", Toast.LENGTH_SHORT).show();
 			if (flag) {
 				service.addProximityAlert(tree.get(name));
 			} else {
@@ -235,17 +250,8 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		}
 	}
 
-	/**
-	 * unbind from service at the end of activity
-	 */
-	protected void onDestroy() {
-		super.onDestroy();
-		Toast.makeText(this, "destroying", Toast.LENGTH_SHORT).show();
-//		unregisterReceiver(receiver);
-		if (bound) {
-			Toast.makeText(this, "unbinding", Toast.LENGTH_SHORT).show();
-			unbindService(connection);
-		}
+	public int getSize() {
+		return size;
 	}
 
 }

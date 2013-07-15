@@ -2,6 +2,7 @@ package com.plumcreektechnology.proximityalertv2;
 
 public interface ProxConstants {
 	public static final String PROX_ALERT_INTENT = "com.plumcreektechnology.proximityalertv2.ProxReceiver";
+	public static final String PACKAGE = "com.plumcreektechnology.proximityalertv2";
 	/*
 	 * Invalid values, used to test geofence storage when retrieving geofences
 	 */
