@@ -240,8 +240,10 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	protected void onDestroy() {
 		super.onDestroy();
+		Toast.makeText(this, "destroying", Toast.LENGTH_SHORT).show();
 //		unregisterReceiver(receiver);
 		if (bound) {
+			Toast.makeText(this, "unbinding", Toast.LENGTH_SHORT).show();
 			unbindService(connection);
 		}
 	}
