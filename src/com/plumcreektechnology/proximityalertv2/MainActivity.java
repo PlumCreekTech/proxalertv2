@@ -28,11 +28,12 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 
 	private TreeMap<String, MyGeofence> tree;
 	
+	// receiver is registered in manifest
 	private ProxAlertService service;
-	private boolean dialogAlert;
-	private boolean bound;
-	private boolean runningInterface;
-//	private ProxReceiver receiver;
+	private boolean dialogAlert; // boolean keeps track of if we are displaying a dialogAlert on this resuming
+	private boolean bound; // keeps track of bound status to client
+	private boolean runningInterface; // keeps track of if the activity is currently displaying a user interface
+	// private ProxReceiver receiver;
 	private UserFragment userFragment;
 	//private Empty empty;
 	private SettingsFragment settingsFragment;
@@ -48,20 +49,8 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		bindService(intent, connection, Context.BIND_AUTO_CREATE);
 		treeGrow();
 		
-		//register receiver
-//		receiver = new ProxReceiver();
-//		IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
-//		registerReceiver(receiver, filter);
-		
-		dialogAlert = false;
-		runningInterface = true;
-		
 		// fragments!
 		fragMan = getFragmentManager();
-		// empty
-//		empty = new Empty();
-//		fragAdder(empty);
-//		fragRemover(empty);
 		// settings
 		settingsFragment = new SettingsFragment();
 		fragAdder(settingsFragment);
@@ -70,25 +59,34 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		userFragment = new UserFragment();
 		userFragment.setListAdapter(treeAdapter());
 		fragAdder(userFragment);
+		runningInterface = false;
+	}
+	
+	protected void onStart() {
+		super.onStart();
+		onNewIntent(getIntent());
 	}
 	
 	protected void onNewIntent(Intent intent) {
 		dialogAlert = intent.getBooleanExtra("dialog", false);
-		if(dialogAlert && !runningInterface) {
+		if(dialogAlert && !runningInterface) { // if we are creating a dialog and the user interface was not being displayed (hide the user interface)
 			//remove preexisting fragments
-			if(userFragment.isVisible()){ //do we need tags...? why did we do that before?
+			if(userFragment.isAdded()){ //do we need tags...? why did we do that before?
 				fragRemover(userFragment);
-			} else {
+			} else if(settingsFragment.isAdded()){
 				fragRemover(settingsFragment);
 			}
 			getActionBar().hide();
 		}
-		if(dialogAlert) {
+		if(dialogAlert) { // if we are creating a dialog regardless
 			//show dialog
 			MyDialogFragment dfrag = new MyDialogFragment();
 			Bundle fragBundle = new Bundle();
 			fragBundle.putString("POI", intent.getStringExtra("POI"));
 			fragBundle.putString("URI", intent.getStringExtra("URI"));
+			if(runningInterface) {
+				fragBundle.putBoolean("hideAfter", false);
+			} else fragBundle.putBoolean("hideAfter", true);
 			dfrag.setArguments(fragBundle);
 			FragmentManager fragman = getFragmentManager();
 			dfrag.show(fragman, null);

@@ -9,20 +9,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MyDialogFragment extends DialogFragment implements ProxConstants {
 	
 	private String POI;
 	private String URI;
+	boolean hideAfter; // do we hide activity after dismissing dialog?
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
 		// inflate the layout that will be returned
 		View layout = inflater.inflate(R.layout.dialog_fragment, container, false);
-		// get the data from the bundle TODO FIX! this currently fails
-//		POI = bundle.getString("POI");
-//		URI = bundle.getString("URI");
-		POI = "Hales";
-		URI = URL;
+		// get the data from the bundle
+		POI = getArguments().getString("POI");
+		URI = getArguments().getString("URI");
+		hideAfter = getArguments().getBoolean("hideAfter");
 		// dynamically set the view objects in the layout to reflect this point of interest
 		//((TextView)layout.findViewById(R.id.textview)).setText(POI); THIS LOOKS REALLY BAD
 		// make sure the buttons call back to the main method
@@ -59,6 +60,7 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 			Intent websurfing = new Intent(Intent.ACTION_VIEW, Uri.parse(URI));
 			startActivity(websurfing);
 		}
+		if(hideAfter) ((MainActivity)getActivity()).onBackPressed(); // so that screen returns to its previous state
 		dismiss();
 	}
 
