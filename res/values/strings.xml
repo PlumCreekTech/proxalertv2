@@ -6,5 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="home">home</string>
     <string name="i_m_alive_">I\'m alive!</string>
+    <string name="visit">visit</string>
+    <string name="ignore">ignore</string>
 
 </resources>
