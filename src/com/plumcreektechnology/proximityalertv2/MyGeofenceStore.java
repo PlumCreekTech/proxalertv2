@@ -16,6 +16,7 @@ public class MyGeofenceStore implements ProxConstants{
 	public static final String KEY_RADIUS = "RADIUS";
 	public static final String KEY_EXPIRATION_DURATION = "EXPIRATION";
 	public static final String KEY_URI = "URI";
+	public static final String KEY_DRAWABLE = "DRAWABLE";
 	// The prefix for flattened geofence keys
 	public static final String KEY_PREFIX = "com.plumcreektechnology.mygeofence";
 
@@ -65,6 +66,8 @@ public class MyGeofenceStore implements ProxConstants{
 				 fences.get(data[1]).setExpiration((Long) entry.getValue());
 			 }else if(data[2].equals(KEY_URI)){
 				 fences.get(data[1]).setUri((String) entry.getValue());
+			 }else if(data[2].equals(KEY_DRAWABLE)){
+				 fences.get(data[1]).setDrawable((Integer) entry.getValue());
 			 }
 		 }
 		 // clear the preferences
@@ -85,13 +88,16 @@ public class MyGeofenceStore implements ProxConstants{
 				getMyGeofenceFieldKey(id, KEY_EXPIRATION_DURATION),
 				INVALID_LONG_VALUE);
 		String uriString = prefs.getString(getMyGeofenceFieldKey(id, KEY_URI), null);
+		int drawable = prefs.getInt(
+				getMyGeofenceFieldKey(id, KEY_DRAWABLE),
+				INVALID_INT_VALUE);
 
 		// If none of the values is incorrect, return the object
 		if (lat != INVALID_FLOAT_VALUE && lng != INVALID_FLOAT_VALUE
 				&& radius != INVALID_FLOAT_VALUE
 				&& expirationDuration != INVALID_LONG_VALUE && !uriString.equals(null)) {
 			// Return a true MyGeofence object
-			return new MyGeofence(id, lat, lng, radius, expirationDuration, uriString);
+			return new MyGeofence(id, lat, lng, radius, expirationDuration, uriString, drawable);
 			// Otherwise, return null.
 		} else {
 			return null;
@@ -118,6 +124,8 @@ public class MyGeofenceStore implements ProxConstants{
 				geofence.getExpiration());
 		editor.putString(getMyGeofenceFieldKey(id, KEY_URI),
 				geofence.getUri());
+		editor.putInt(getMyGeofenceFieldKey(id, KEY_DRAWABLE),
+				geofence.getDrawable());
 		editor.commit();
 	}
 
@@ -127,6 +135,7 @@ public class MyGeofenceStore implements ProxConstants{
 		editor.remove(getMyGeofenceFieldKey(id, KEY_LONGITUDE));
 		editor.remove(getMyGeofenceFieldKey(id, KEY_RADIUS));
 		editor.remove(getMyGeofenceFieldKey(id, KEY_EXPIRATION_DURATION));
+		editor.remove(getMyGeofenceFieldKey(id, KEY_DRAWABLE));
 		editor.commit();
 	}
 	

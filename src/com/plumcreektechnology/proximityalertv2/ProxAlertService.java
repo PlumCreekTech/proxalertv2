@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.widget.Toast;
 
 public class ProxAlertService extends Service implements ProxConstants{
 
@@ -62,6 +63,7 @@ public class ProxAlertService extends Service implements ProxConstants{
 		Intent intent = new Intent(PROX_ALERT_INTENT);
 		intent.putExtra("POI", geofence.getId());
 		intent.putExtra("URI", geofence.getUri());
+		intent.putExtra("ICON", geofence.getDrawable());
 		// hashcode is necessary so that the pending intents don't overwrite
 		// each other
 		return PendingIntent.getBroadcast(this, geofence.getId().hashCode(),

@@ -97,7 +97,6 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		return true;
 	}
 	
-	
 	protected void onStart() {
 		super.onStart();
 		onNewIntent(getIntent());
@@ -120,6 +119,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			Bundle fragBundle = new Bundle();
 			fragBundle.putString("POI", intent.getStringExtra("POI"));
 			fragBundle.putString("URI", intent.getStringExtra("URI"));
+			fragBundle.putInt("ICON", intent.getIntExtra("ICON", INVALID_INT_VALUE));
 			if(runningInterface) {
 				fragBundle.putBoolean("hideAfter", false);
 			} else fragBundle.putBoolean("hideAfter", true);
@@ -165,13 +165,13 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	private void treeGrow() {
 		tree = new TreeMap<String, MyGeofence>();
-		tree.put("Public Library", new MyGeofence("Public Library", 41.289818, -82.216895, RADIUS, EXPIRATION, "http://www.oberlinpl.lib.oh.us/"));
-		tree.put("South", new MyGeofence("South", 41.289508, -82.221159, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/traditional-housing/south.dot"));
-		tree.put("Hales", new MyGeofence("Hales", 41.294764, -82.223917, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=352252&buildingId=30220"));
-		tree.put("Science Center", new MyGeofence("Science Center", 41.294692, -82.221782, RADIUS, EXPIRATION, "http://www.oberlin.edu/science/"));
-		tree.put("Laundromat", new MyGeofence("Laundromat", 41.294426, -82.212115, RADIUS, EXPIRATION, "http://en.wiktionary.org/wiki/laundromat"));
-		tree.put("Tank", new MyGeofence("Tank", 41.292088, -82.213263, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/co-ops/tank.dot"));
-		tree.put("Arboretum", new MyGeofence("Arboretum", 41.285558, -82.226127, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=2111210&buildingId=175090"));
+		tree.put("Public Library", new MyGeofence("Public Library", 41.289818, -82.216895, RADIUS, EXPIRATION, "http://www.oberlinpl.lib.oh.us/", ICON));
+		tree.put("South", new MyGeofence("South", 41.289508, -82.221159, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/traditional-housing/south.dot", ICON));
+		tree.put("Hales", new MyGeofence("Hales", 41.294764, -82.223917, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=352252&buildingId=30220", ICON));
+		tree.put("Science Center", new MyGeofence("Science Center", 41.294692, -82.221782, RADIUS, EXPIRATION, "http://www.oberlin.edu/science/", ICON));
+		tree.put("Laundromat", new MyGeofence("Laundromat", 41.294426, -82.212115, RADIUS, EXPIRATION, "http://en.wiktionary.org/wiki/laundromat", ICON));
+		tree.put("Tank", new MyGeofence("Tank", 41.292088, -82.213263, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/co-ops/tank.dot", ICON));
+		tree.put("Arboretum", new MyGeofence("Arboretum", 41.285558, -82.226127, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=2111210&buildingId=175090", ICON));
 	}
 
 	/**

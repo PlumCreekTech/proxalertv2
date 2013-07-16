@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 public class MyDialogFragment extends DialogFragment implements ProxConstants {
 
@@ -17,6 +19,7 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 	
 	private String POI;
 	private String URI;
+	private int icon;
 	boolean hideAfter; // do we hide activity after dismissing dialog?
 	private ChangeList listChange;
 
@@ -25,13 +28,16 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		
 		// get data from arguments
-		POI = getArguments().getString("POI");
-		URI = getArguments().getString("URI");
-		hideAfter = getArguments().getBoolean("hideAfter");
+		Bundle bundle = getArguments();
+		POI = bundle.getString("POI");
+		URI = bundle.getString("URI");
+		icon = bundle.getInt("ICON", INVALID_INT_VALUE);
+		Log.d("icon", "icon in dialog is "+icon);
+		hideAfter = bundle.getBoolean("hideAfter");
 		
 		// format and build and return the dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder( ((Activity)listChange), AlertDialog.THEME_DEVICE_DEFAULT_DARK);
-		builder.setMessage("you're near " + POI).setTitle("PROXIMITY UPDATE").setIcon(R.drawable.ic_launcher);
+		builder.setMessage("you're near " + POI).setTitle("PROXIMITY UPDATE").setIcon(icon);
 		builder.setPositiveButton("visit",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {

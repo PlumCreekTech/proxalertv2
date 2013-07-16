@@ -10,6 +10,7 @@ public class MyGeofence implements Comparable<MyGeofence>, ProxConstants {
 	private float radius;
 	private long expiration;
 	private String uri;
+	private int drawable;
 	
 	public MyGeofence(String name){
 		id = name;
@@ -17,16 +18,18 @@ public class MyGeofence implements Comparable<MyGeofence>, ProxConstants {
 		longitude = INVALID_FLOAT_VALUE;
 		radius = INVALID_FLOAT_VALUE;
 		expiration = INVALID_LONG_VALUE;
+		drawable = ICON;
 		//look up invalid double in store?
 	}
 
-	public MyGeofence(String id, double latitude, double longitude, float radius, long expiration, String uri) {
+	public MyGeofence(String id, double latitude, double longitude, float radius, long expiration, String uri, int drawable) {
 		this.id = id;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.radius = radius;
 		this.expiration = expiration;
 		this.uri = uri;
+		this.drawable = drawable;
 	}
 
 	public String getId() {
@@ -53,6 +56,10 @@ public class MyGeofence implements Comparable<MyGeofence>, ProxConstants {
 		return uri;
 	}
 
+	public int getDrawable() {
+		return drawable;
+	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -75,6 +82,10 @@ public class MyGeofence implements Comparable<MyGeofence>, ProxConstants {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+	
+	public void setDrawable(int drawable) {
+		this.drawable = drawable;
 	}
 
 	@Override

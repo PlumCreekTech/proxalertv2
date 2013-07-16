@@ -15,4 +15,5 @@ public interface ProxConstants {
 	public static final float RADIUS = 200;
 	public static final long EXPIRATION = -1;
 	public static final String URL = "https://twitter.com/StealthMountain";
+	public static final int ICON = R.drawable.ic_launcher;
 }
