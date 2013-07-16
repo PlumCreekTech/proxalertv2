@@ -17,35 +17,5 @@
 	    android:selectable="false"
 	    android:shouldDisableView="true"
 	    />
-     
-    <!-- <PreferenceScreen
-        android:key="subScreen"
-        android:title="subScreen"
-        android:persistent="false">
-        <CheckBoxPreference
-            android:id="@+id/checkboxone"
-            android:key="CheckBox"
-            android:defaultValue="true"
-            android:disableDependentsState="true" 
-            android:title="checkbox" />
-        <EditTextPreference
-            android:id="@+id/textEdit"
-            android:defaultValue="enter text"
-            android:key="EditText"
-            android:summary="enter text"
-            android:title="edit text"
-            android:dependency="CheckBox" />
-    </PreferenceScreen>
 
-    <PreferenceCategory 
-        android:key="category"
-        android:title="category">
-        <SwitchPreference 
-            android:key="swatch"
-            android:title="swatch"
-            android:defaultValue="true">
-            <intent
-                />
-        </SwitchPreference>
-    </PreferenceCategory> -->
 </PreferenceScreen>

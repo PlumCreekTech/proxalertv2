@@ -11,6 +11,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
@@ -18,11 +19,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.plumcreektechnology.proximityalertv2.MyDialogFragment.ChangeList;
 import com.plumcreektechnology.proximityalertv2.ProxAlertService.ProxAlertBinder;
 import com.plumcreektechnology.proximityalertv2.UserFragment.POISelect;
 
-public class MainActivity extends FragmentActivity implements ProxConstants, POISelect {
+public class MainActivity extends FragmentActivity implements ProxConstants, POISelect, ChangeList {
 
 	private TreeMap<String, MyGeofence> tree;
 	
@@ -37,6 +40,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	//private Empty empty;
 	private SettingsFragment settingsFragment;
 	private FragmentManager fragMan;
+	private ArrayList<String> treeList;
 	
 	/**
 	 * service connection global variable for binding to ProxAlertService
@@ -176,7 +180,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 * @return
 	 */
 	private ArrayAdapter<String> treeAdapter() {
-		ArrayList<String> treeList = new ArrayList<String>();
+		treeList = new ArrayList<String>();
 		for(Map.Entry<String, MyGeofence> entry: tree.entrySet()) {
 			treeList.add(entry.getKey());
 		}
@@ -252,6 +256,25 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 
 	public int getSize() {
 		return size;
+	}
+
+	@Override
+	public void update(String name, boolean flag) { // a slightly eccentric work-around to updating GUI
+		for (int i = 0; i < size; i++) {			// depending on how the user responds to the alert
+			if ( name.equals(treeList.get(i)) ) {	// if the list is in view, change it in the GUI
+				if(userFragment.isVisible()) {
+					ListView lview = userFragment.getListView();
+					lview.setItemChecked( i, flag);
+				}
+				else {	// if the list fragment is hidden, change shared preferences so the next time it loads it will be updated
+					SharedPreferences.Editor ed = getSharedPreferences(UserFragment.KEY_THIS_PREFERENCE, Context.MODE_PRIVATE).edit();
+					ed.putBoolean(UserFragment.getItemPreferenceKey(i), flag);
+					ed.commit();
+				}
+				break;
+			}
+		}
+		onPointSelect(name, flag);
 	}
 
 }

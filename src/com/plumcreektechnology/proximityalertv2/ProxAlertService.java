@@ -62,8 +62,10 @@ public class ProxAlertService extends Service implements ProxConstants{
 		Intent intent = new Intent(PROX_ALERT_INTENT);
 		intent.putExtra("POI", geofence.getId());
 		intent.putExtra("URI", geofence.getUri());
+		// hashcode is necessary so that the pending intents don't overwrite
+		// each other
 		return PendingIntent.getBroadcast(this, geofence.getId().hashCode(),
-				intent, PendingIntent.FLAG_UPDATE_CURRENT); // TODO make it work for multiple points!
+				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 }

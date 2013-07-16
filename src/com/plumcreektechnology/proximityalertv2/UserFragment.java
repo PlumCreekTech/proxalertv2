@@ -16,8 +16,8 @@ import android.widget.ListView;
 public class UserFragment extends ListFragment implements ProxConstants {
 	
 	private POISelect onSelect;
-	private String KEY_THIS_PREFERENCE = "list_prefs";
-	private String KEY_ITEM_POSITION = "position";
+	protected static final String KEY_THIS_PREFERENCE = "list_prefs"; // these are accessed by the main
+	protected static final String KEY_ITEM_POSITION = "position";	  // activity when updating GUI
 	private SharedPreferences prefs;
 	
 	/**
@@ -69,7 +69,7 @@ public class UserFragment extends ListFragment implements ProxConstants {
 	 * @param pos
 	 * @return
 	 */
-	private String getItemPreferenceKey(int pos) {
+	protected static String getItemPreferenceKey(int pos) { // this is accessed by main activity when updating GUI
 		return PACKAGE + "_" + KEY_ITEM_POSITION + "_" + pos;
 	}
 	

@@ -1,5 +1,6 @@
 package com.plumcreektechnology.proximityalertv2;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -7,16 +8,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 
 public class MyDialogFragment extends DialogFragment implements ProxConstants {
 
+	private static final int REMOVE = 0;
+	private static final int IGNORE = 1;
+	private static final int VISIT = 2;
+	
 	private String POI;
 	private String URI;
 	boolean hideAfter; // do we hide activity after dismissing dialog?
+	private ChangeList listChange;
 
 	/** The system calls this only when creating the layout in a dialog. */
 	@Override
@@ -28,24 +30,27 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 		hideAfter = getArguments().getBoolean("hideAfter");
 		
 		// format and build and return the dialog
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setMessage("you're near " + POI).setTitle("PROXIMITY UPDATE");
+		AlertDialog.Builder builder = new AlertDialog.Builder( ((Activity)listChange), AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+		builder.setMessage("you're near " + POI).setTitle("PROXIMITY UPDATE").setIcon(R.drawable.ic_launcher);
 		builder.setPositiveButton("visit",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						buttonSelected(true);
+						//buttonSelected(true);
+						buttonSelected(VISIT);
 					}
 				});
-		builder.setNeutralButton("not now",
+		builder.setNeutralButton("ignore",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						buttonSelected(false);
+						// buttonSelected(false);
+						buttonSelected(IGNORE);
 					}
 				});
-		builder.setNegativeButton("ignore",
+		builder.setNegativeButton("remove",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						buttonSelected(false);
+						// buttonSelected(false);
+						buttonSelected(REMOVE);
 					}
 				});
 		return builder.create();
@@ -56,44 +61,57 @@ public class MyDialogFragment extends DialogFragment implements ProxConstants {
 	 * opens a web page for relevant comment in all cases it dismisses the
 	 * dialog at the end
 	 */
-	public void buttonSelected(Boolean action) {
+	public void buttonSelected(Boolean action) { // TODO remove
 		if (action) {
 			Intent websurfing = new Intent(Intent.ACTION_VIEW, Uri.parse(URI));
 			startActivity(websurfing);
 		}
 		if (hideAfter)
-			((MainActivity) getActivity()).onBackPressed(); // so that screen
+			((Activity) listChange).onBackPressed(); // so that screen
 															// returns to its
 															// previous state
 		dismiss();
 	}
+	
+	public void buttonSelected(int action) { // TODO implement 3 button functionality
+		switch (action) {
+		case (VISIT):
+			Intent websurfing = new Intent(Intent.ACTION_VIEW, Uri.parse(URI));
+			startActivity(websurfing); // maybe remove point from alerts if it is being visited...
+			break;
+		case (REMOVE):
+			listChange.update(POI, false);
+			break;
+		}
+		if (hideAfter)
+			((Activity) listChange).onBackPressed(); // so that screen returns to its previous state
+		dismiss(); 
+	}
+	
+	/**
+	 * makes sure that an instantiating activity can not attach this fragment
+	 * unless it implements POISelect and saves the activity in onSelect for
+	 * future reference
+	 */
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			listChange = (ChangeList) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement changeList");
+		}
+	}
+	
+	/**
+	 * interface this fragment requires for an activity to instantiate it
+	 * must receive a string (location name) and a boolean (checked or unchecked)
+	 * @author devinfrenze
+	 *
+	 */
+	public interface ChangeList {
+		public void update(String name, boolean flag);
+	}
 
-//	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//	Bundle bundle) {
-
-// // inflate the layout that will be returned
-// View layout = inflater.inflate(R.layout.dialog_fragment, container,
-// false);
-//
-// // dynamically set the view objects in the layout to reflect this
-// point of interest
-// //((TextView)layout.findViewById(R.id.textview)).setText(POI); THIS
-// LOOKS REALLY BAD
-// // make sure the buttons call back to the main method
-// ((Button)layout.findViewById(R.id.positive)).setOnClickListener(new
-// Button.OnClickListener() {
-// public void onClick(View v) {
-// //responder.positiveSelected(MyDialogFragment.this);
-// buttonSelected(true);
-// }
-// });
-// ((Button)layout.findViewById(R.id.negative)).setOnClickListener(new
-// Button.OnClickListener() {
-// public void onClick(View v) {
-// //responder.negativeSelected(MyDialogFragment.this);
-// buttonSelected(false);
-// }
-// });
-// return layout;
-//}
 }
