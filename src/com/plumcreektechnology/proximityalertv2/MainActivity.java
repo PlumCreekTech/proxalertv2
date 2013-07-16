@@ -12,8 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -41,6 +44,10 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	private SettingsFragment settingsFragment;
 	private FragmentManager fragMan;
 	private ArrayList<String> treeList;
+	private Vibrator vibrator;
+	private final long[] VIBRATE_PATTERN = {0, 200, 200, 200, 200, 200};
+	private AudioManager audioman;
+	private PowerManager powerman;
 	
 	/**
 	 * service connection global variable for binding to ProxAlertService
@@ -73,6 +80,11 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		bindService(intent, connection, Context.BIND_AUTO_CREATE);
 		treeGrow();
 		size = tree.size();
+		
+		// initialize alert effects
+		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		audioman = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		powerman = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		
 		// fragments!
 		fragMan = getFragmentManager();
@@ -126,6 +138,17 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			dfrag.setArguments(fragBundle);
 			FragmentManager fragman = getFragmentManager();
 			dfrag.show(fragman, null);
+			
+			// vibrate, make sound, and light up 
+			vibrator.vibrate( VIBRATE_PATTERN, -1);
+			if(audioman.getRingerMode()==AudioManager.RINGER_MODE_NORMAL) {
+				audioman.loadSoundEffects();
+				audioman.playSoundEffect(AudioManager.FX_FOCUS_NAVIGATION_UP);
+				audioman.unloadSoundEffects();
+			}
+			PowerManager.WakeLock wl = powerman.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "dialog light-up");
+			wl.acquire(1000);
+			wl.release();
 		}
 	}
 	
