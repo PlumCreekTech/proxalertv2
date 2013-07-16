@@ -23,7 +23,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.plumcreektechnology.proximityalertv2.MyDialogFragment.ChangeList;
 import com.plumcreektechnology.proximityalertv2.ProxAlertService.ProxAlertBinder;
 import com.plumcreektechnology.proximityalertv2.UserFragment.POISelect;
@@ -48,6 +51,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	private final long[] VIBRATE_PATTERN = {0, 200, 200, 200, 200, 200};
 	private AudioManager audioman;
 	private PowerManager powerman;
+
+	private MapFragment mapfrag;
+	private GoogleMap map;
 	
 	/**
 	 * service connection global variable for binding to ProxAlertService
@@ -97,6 +103,17 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		userFragment.setListAdapter(treeAdapter());
 		fragAdder(userFragment);
 		runningInterface = false;
+		// map
+		mapfrag = MapFragment.newInstance(); //(MapFragment) fragMan.findFragmentById(R.id.map);
+		map = mapfrag.getMap();
+
+		if (map != null) {
+			map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+			map.setMyLocationEnabled(true);
+		} else{
+			Toast.makeText(this, "map is null", Toast.LENGTH_SHORT);
+		}
+		fragAdder(mapfrag);
 	}
 
 	/**
@@ -222,6 +239,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		case (R.id.user_frag):
 			fragReplacer(userFragment);
 			break;
+		case(R.id.map_frag):
+			fragReplacer(mapfrag);
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -258,7 +278,6 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		trans.addToBackStack(null);
 		trans.commit();
 	}
-	
 	
 	/**
 	 * receive changes from user interface and ask service to add and remove

@@ -7,13 +7,29 @@
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="17" />
+    
+    <!-- permissions -->
+    <permission
+        android:name="your.application.package.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.example.maptest.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<application
+    
+    <!-- open gl check -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />    
+
+    <application
         android:allowBackup="true"
         android:backgroundDimEnabled="false"
         android:icon="@drawable/ic_launcher"
@@ -46,6 +62,11 @@
 		    </intent-filter>
 		</receiver>
 		
+		<!-- key -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBFNxcRwm13h_1jeuucdEDqo2ukQ2eimwM" />
+        
     </application>
 
 </manifest>
