@@ -8,5 +8,6 @@
     <string name="i_m_alive_">I\'m alive!</string>
     <string name="visit">visit</string>
     <string name="ignore">ignore</string>
+    <string name="map">Map</string>
 
 </resources>
