@@ -3,6 +3,7 @@ package com.plumcreektechnology.proximityalertv2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import android.app.ActivityManager;
@@ -44,7 +45,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	private ProxAlertService service;
 	private int size;
 	private boolean dialogAlert; // boolean keeps track of if we are displaying a dialogAlert on this resuming
-//	private boolean bound; // keeps track of bound status to client
+	private boolean bound; // keeps track of bound status to client
 	private boolean runningInterface; // keeps track of if the activity is currently displaying a user interface
 	// private ProxReceiver receiver;
 	private UserFragment userFragment;
@@ -69,12 +70,13 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		public void onServiceConnected(ComponentName className, IBinder iBinder) {
 			ProxAlertBinder binder = (ProxAlertBinder) iBinder;
 			service = binder.getService();
-//			bound = true;
+			Toast.makeText(MainActivity.this, "service connected", Toast.LENGTH_SHORT).show();
+			bound = true;
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName className) {
-//			bound = false;			
+			bound = false;			
 		}
 		
 	};
@@ -134,19 +136,22 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		onNewIntent(getIntent());
 		
 		//check if switch is on & service is running
-		boolean proxSwitch = !settingsFragment.getIsChecked();
+		boolean proxSwitch = settingsFragment.getIsChecked();
 		Toast.makeText(this, "proxSwitch = "+proxSwitch, Toast.LENGTH_SHORT).show();
-		if(proxSwitch && isServiceConnected()){
+		if(proxSwitch && bound){
 			//all set
 			Toast.makeText(this, "all set - on!", Toast.LENGTH_SHORT).show();
 			
-		}else if(proxSwitch && !isServiceConnected()){
+		}else if(proxSwitch && !bound){
+			Toast.makeText(this, "On: Connecting service", Toast.LENGTH_SHORT).show();
 			// bind activity to ProxAlertService
 			Intent intent = new Intent(this, ProxAlertService.class);
-			bindService(intent, connection, Context.BIND_AUTO_CREATE);			
+			bindService(intent, connection, Context.BIND_AUTO_CREATE);
+			bound = true;
 		}else {
 			//service shouldn't be connected, switch off
 			Toast.makeText(this, "all set - off!", Toast.LENGTH_SHORT).show();
+			bound = false;
 		}
 	}
 	
@@ -211,8 +216,9 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	protected void onDestroy() {
 		super.onDestroy();
-		if (isServiceConnected()) {
+		if (bound) {
 			unbindService(connection);
+			bound = false;
 		}
 	}
 
@@ -306,7 +312,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	@Override
 	public void onPointSelect(String name, boolean flag) {
-		if (isServiceConnected()) {
+		if (bound) {
 			if (flag) {
 				service.addProximityAlert(tree.get(name));
 			} else {
@@ -327,22 +333,37 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			Toast.makeText(this, "Switch is on", Toast.LENGTH_SHORT).show();
 			
 			//TODO deal with service
-			if(isServiceConnected()){
+			if(bound){
 				Toast.makeText(this, "service is connected. winning.", Toast.LENGTH_SHORT).show();
 			}else{
 				Toast.makeText(this, "service not connected, let's fix it", Toast.LENGTH_SHORT).show();
+				// bind activity to ProxAlertService
+				Intent intent = new Intent(this, ProxAlertService.class);
+				bindService(intent, connection, Context.BIND_AUTO_CREATE);
+				bound = true;
 			}
 		}else{
 			Toast.makeText(this, "Switch is off", Toast.LENGTH_SHORT).show();
 			
-			//TODO deal with service
-			if(!isServiceConnected()){
+			//TODO deal with service && remove alerts
+			if(!bound){
 				Toast.makeText(this, "service not connected. great.", Toast.LENGTH_SHORT).show();
 			}else{
 				Toast.makeText(this, "service connected, let's disconnect", Toast.LENGTH_SHORT).show();
+				//unbind & remove alerts
+				unbindService(connection);
+				bound = false;
+				removeAlerts();
+				//TODO uncheck list?
 			}
 		}
 		
+	}
+	
+	public void removeAlerts(){
+		for(Entry<String, MyGeofence> entry : tree.entrySet()){
+			service.removeProximityAlert(entry.getValue());
+		}
 	}
 
 	public int getSize() {
@@ -358,9 +379,12 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	    ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
 	        if ("com.example.MyService".equals(service.service.getClassName())) {
+	            Log.d("service", "connected");
 	            return true;
 	        }
 	    }
+
+        Log.d("service", "not connected");
 	    return false;
 	}
 	
