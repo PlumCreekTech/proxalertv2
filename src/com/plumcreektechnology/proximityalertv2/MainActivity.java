@@ -1,9 +1,13 @@
 package com.plumcreektechnology.proximityalertv2;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.Application;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -29,9 +33,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.plumcreektechnology.proximityalertv2.MyDialogFragment.ChangeList;
 import com.plumcreektechnology.proximityalertv2.ProxAlertService.ProxAlertBinder;
+import com.plumcreektechnology.proximityalertv2.SettingsFragment.SettingsCheck;
 import com.plumcreektechnology.proximityalertv2.UserFragment.POISelect;
 
-public class MainActivity extends FragmentActivity implements ProxConstants, POISelect, ChangeList {
+public class MainActivity extends FragmentActivity implements ProxConstants, POISelect, ChangeList, SettingsCheck {
 
 	private TreeMap<String, MyGeofence> tree;
 	
@@ -39,7 +44,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	private ProxAlertService service;
 	private int size;
 	private boolean dialogAlert; // boolean keeps track of if we are displaying a dialogAlert on this resuming
-	private boolean bound; // keeps track of bound status to client
+//	private boolean bound; // keeps track of bound status to client
 	private boolean runningInterface; // keeps track of if the activity is currently displaying a user interface
 	// private ProxReceiver receiver;
 	private UserFragment userFragment;
@@ -64,12 +69,12 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		public void onServiceConnected(ComponentName className, IBinder iBinder) {
 			ProxAlertBinder binder = (ProxAlertBinder) iBinder;
 			service = binder.getService();
-			bound = true;
+//			bound = true;
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName className) {
-			bound = false;			
+//			bound = false;			
 		}
 		
 	};
@@ -81,9 +86,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		// bind activity to ProxAlertService
-		Intent intent = new Intent(this, ProxAlertService.class);
-		bindService(intent, connection, Context.BIND_AUTO_CREATE);
+		//create tree
 		treeGrow();
 		size = tree.size();
 		
@@ -111,7 +114,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 			map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 			map.setMyLocationEnabled(true);
 		} else{
-			Toast.makeText(this, "map is null", Toast.LENGTH_SHORT);
+			Toast.makeText(this, "map is null", Toast.LENGTH_SHORT).show();
 		}
 		fragAdder(mapfrag);
 	}
@@ -129,6 +132,22 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	protected void onStart() {
 		super.onStart();
 		onNewIntent(getIntent());
+		
+		//check if switch is on & service is running
+		boolean proxSwitch = !settingsFragment.getIsChecked();
+		Toast.makeText(this, "proxSwitch = "+proxSwitch, Toast.LENGTH_SHORT).show();
+		if(proxSwitch && isServiceConnected()){
+			//all set
+			Toast.makeText(this, "all set - on!", Toast.LENGTH_SHORT).show();
+			
+		}else if(proxSwitch && !isServiceConnected()){
+			// bind activity to ProxAlertService
+			Intent intent = new Intent(this, ProxAlertService.class);
+			bindService(intent, connection, Context.BIND_AUTO_CREATE);			
+		}else {
+			//service shouldn't be connected, switch off
+			Toast.makeText(this, "all set - off!", Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	protected void onNewIntent(Intent intent) {
@@ -192,7 +211,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	protected void onDestroy() {
 		super.onDestroy();
-		if (bound) {
+		if (isServiceConnected()) {
 			unbindService(connection);
 		}
 	}
@@ -212,6 +231,8 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		tree.put("Laundromat", new MyGeofence("Laundromat", 41.294426, -82.212115, RADIUS, EXPIRATION, "http://en.wiktionary.org/wiki/laundromat", ICON));
 		tree.put("Tank", new MyGeofence("Tank", 41.292088, -82.213263, RADIUS, EXPIRATION, "http://new.oberlin.edu/office/housing/housing-options/co-ops/tank.dot", ICON));
 		tree.put("Arboretum", new MyGeofence("Arboretum", 41.285558, -82.226127, RADIUS, EXPIRATION, "http://new.oberlin.edu/student-life/facilities/detail.dot?id=2111210&buildingId=175090", ICON));
+		tree.put("Giraffe", new MyGeofence("Giraffe", 41.294889, -82.216921, 20, EXPIRATION, "http://animals.nationalgeographic.com/animals/mammals/giraffe/", ICON));
+		tree.put("Keep", new MyGeofence("Keep", 41.295898, -82.217575, RADIUS, EXPIRATION, "http://oberwiki.net/Keep_Cottage", ICON));
 	}
 
 	/**
@@ -285,7 +306,7 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 	 */
 	@Override
 	public void onPointSelect(String name, boolean flag) {
-		if (bound) {
+		if (isServiceConnected()) {
 			if (flag) {
 				service.addProximityAlert(tree.get(name));
 			} else {
@@ -296,10 +317,53 @@ public class MainActivity extends FragmentActivity implements ProxConstants, POI
 		}
 	}
 
+	/**
+	 * reacts to changing switch
+	 */
+	@Override
+	public void onSwitchChanged() {
+		boolean proxSwitch = !settingsFragment.getIsChecked(); //why the hell is it backwards?
+		if(proxSwitch){
+			Toast.makeText(this, "Switch is on", Toast.LENGTH_SHORT).show();
+			
+			//TODO deal with service
+			if(isServiceConnected()){
+				Toast.makeText(this, "service is connected. winning.", Toast.LENGTH_SHORT).show();
+			}else{
+				Toast.makeText(this, "service not connected, let's fix it", Toast.LENGTH_SHORT).show();
+			}
+		}else{
+			Toast.makeText(this, "Switch is off", Toast.LENGTH_SHORT).show();
+			
+			//TODO deal with service
+			if(!isServiceConnected()){
+				Toast.makeText(this, "service not connected. great.", Toast.LENGTH_SHORT).show();
+			}else{
+				Toast.makeText(this, "service connected, let's disconnect", Toast.LENGTH_SHORT).show();
+			}
+		}
+		
+	}
+
 	public int getSize() {
 		return size;
 	}
 
+	/**
+	 * checks if service is running, returns appropriate boolean
+	 * @param serviceClassName
+	 * @return
+	 */
+	private boolean isServiceConnected() {
+	    ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if ("com.example.MyService".equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+	
 	@Override
 	public void update(String name, boolean flag) { // a slightly eccentric work-around to updating GUI
 		for (int i = 0; i < size; i++) {			// depending on how the user responds to the alert
